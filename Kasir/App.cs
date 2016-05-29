@@ -8,12 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Kaos
+namespace Kasir
 {
     class App
     {
         public static string toko = Environment.GetCommandLineArgs()[1].ToString();
-        public static bool admin = Convert.ToBoolean(Environment.GetCommandLineArgs()[2].ToString());
+        public static bool fingerprint = Convert.ToBoolean(Environment.GetCommandLineArgs()[2].ToString());
         public static string printer = Environment.GetCommandLineArgs()[3].ToString();
 
 
@@ -33,7 +33,7 @@ namespace Kaos
         public static DataTable executeReader(string query)
 
         {
-            DataTable results = new DataTable("Results");
+            DataTable results = new DataTable();
             using (MySqlConnection connection = new MySqlConnection(App.getConnectionString()))
             {
                 using (MySqlCommand command = new MySqlCommand(query, connection))
@@ -302,6 +302,31 @@ namespace Kaos
                    ? value
                    : value.Substring(0, maxLength)
                    );
+        }
+
+        public static void Testing(string search, DataGridView dgv)
+        {
+            MySqlConnection conn = new MySqlConnection(getConnectionString());
+
+            using (MySqlCommand command = new MySqlCommand(search, conn))
+            {
+                command.Connection.Open();
+                command.ExecuteNonQuery();
+
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            dgv.Rows.Add(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4), reader.GetString(5));
+                        }
+                    }
+                    reader.Close();
+                }
+
+            }
+
         }
     }
 }
